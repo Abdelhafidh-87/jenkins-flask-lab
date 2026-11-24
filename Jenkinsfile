@@ -9,9 +9,18 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Source code is available in the workspace.'
+            }
+        }
+
+        stage('Docker Check') {
+            steps {
+                sh 'whoami'
+                sh 'docker --version'
+                sh 'docker ps'
             }
         }
 
@@ -57,12 +66,5 @@ pipeline {
         failure {
             echo 'Pipeline failed. Check the stage that reported an error.'
         }
-    }
-}
-stage('Docker Check') {
-    steps {
-        sh 'whoami'
-        sh 'docker --version'
-        sh 'docker ps'
     }
 }
