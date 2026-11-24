@@ -1,67 +1,61 @@
+
 pipeline {
-agent any
-environment {
-IMAGE_NAME = 'jenkins-flask-lab'
-CONTAINER_NAME = 'jenkins-flask-app'
-APP_PORT = '8081'
-}
-stages {
-stage('Checkout') {
-steps {
-echo 'Source code is available in the workspace.'
-}
-}
-stage('Build') {
-steps {
-sh 'docker build -t IMAGE {BUILD_NUMBER} .' N
+    agent any
 
-AME:
+    environment {
+        IMAGE_NAME = 'jenkins-flask-lab'
+        CONTAINER_NAME = 'jenkins-flask-app'
+        APP_PORT = '8081'
+    }
 
-5
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Source code is available in the workspace.'
+            }
+        }
 
-}
-}
-stage('Test') {
-steps {
-sh 'docker run --rm IMAGE {BUILD_NUMBER} pytest -v' N
+        stage('Build') {
+            steps {
+                sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
+            }
+        }
 
-AME:
+        stage('Test') {
+            steps {
+                sh 'docker run --rm ${IMAGE_NAME}:${BUILD_NUMBER} pytest -v'
+            }
+        }
 
-}
-}
-stage('Deploy') {
-steps {
-sh '''
-docker rm -f ${CONTAINER_NAME} || true
-docker run -d --name ${CONTAINER_NAME} -p APP
-P
-ORT: 8000 − eAPP
-V
-ERSION =
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker rm -f ${CONTAINER_NAME} || true
 
-{BUILD_NUMBER} IMAGE {BUILD_NUMBER} N
+                    docker run -d \
+                        --name ${CONTAINER_NAME} \
+                        -p ${APP_PORT}:8000 \
+                        -e APP_VERSION=${BUILD_NUMBER} \
+                        ${IMAGE_NAME}:${BUILD_NUMBER}
+                '''
+            }
+        }
 
-AME:
+        stage('Verify') {
+            steps {
+                sh 'curl --fail --retry 10 --retry-delay 2 http://localhost:${APP_PORT}/health'
+                sh 'curl --fail http://localhost:${APP_PORT}/'
+            }
+        }
+    }
 
-'''
-}
-}
-stage('Verify') {
-steps {
-sh 'curl --fail --retry 10 --retry-delay 2 http://localhost:${APP_PORT}/health'
-sh 'curl --fail http://localhost:${APP_PORT}/'
-}
-}
-}
-post {
-success {
-echo 'Pipeline completed successfully.'
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
 
-6
-
-}
-failure {
-echo 'Pipeline failed. Check the stage that reported an error.'
-}
-}
+        failure {
+            echo 'Pipeline failed. Check the stage that reported an error.'
+        }
+    }
 }
