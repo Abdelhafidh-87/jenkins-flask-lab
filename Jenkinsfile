@@ -59,3 +59,10 @@ pipeline {
         }
     }
 }
+stage('Docker Check') {
+    steps {
+        sh 'whoami'
+        sh 'docker --version'
+        sh 'docker ps'
+    }
+}
