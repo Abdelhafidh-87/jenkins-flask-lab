@@ -49,13 +49,20 @@ pipeline {
                 '''
             }
         }
-
+        stage('Debug Network') {
+            steps {
+                sh 'whoami'
+                sh 'hostname'
+                sh 'docker ps'
+                sh 'curl -4 -v http://127.0.0.1:8081/health'
+        }
+    }
         stage('Verify') {
             steps {
-                sh 'curl --fail --retry 10 --retry-delay 2 http://localhost:${APP_PORT}/health'
-                sh 'curl --fail http://localhost:${APP_PORT}/'
-            }
-        }
+            sh 'curl -4 --fail --retry 10 --retry-delay 2 http://127.0.0.1:${APP_PORT}/health'
+            sh 'curl -4 --fail http://127.0.0.1:${APP_PORT}/'
+    }
+}
     }
 
     post {
