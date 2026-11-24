@@ -32,9 +32,9 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'docker run --rm ${IMAGE_NAME}:${BUILD_NUMBER} pytest -v'
-            }
-        }
+                sh 'docker run --rm ${IMAGE_NAME}:${BUILD_NUMBER} python -m pytest -v'
+    }
+}
 
         stage('Deploy') {
             steps {
